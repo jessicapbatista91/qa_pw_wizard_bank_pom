@@ -1,30 +1,13 @@
-import { test } from '@playwright/test';
-import { faker } from '@faker-js/faker';
+import { test, expect } from '@playwright/test';
+import { ManagerPage } from '../../../src/pages/manager/ManagerPage';
 
-let firstName;
-let lastName;
-let postalCode;
+test('Assert manager can search customer by postal code', async ({ page }) => {
+  const managerPage = new ManagerPage(page);
+  await page.goto('https://www.globalsqa.com/angularJs-protractor/BankingProject/#/manager/list');
 
-test.beforeEach(async ({ page }) => {
-  /* 
-  Pre-conditons:
-  1. Open Add Customer page.
-  2. Fill the First Name.  
-  3. Fill the Last Name.
-  4. Fill the Postal Code.
-  5. Click [Add Customer].
-  */
-  firstName = faker.person.firstName();
-  lastName = faker.person.lastName();
-  postalCode = faker.location.zipCode();
-});
-
-test('Assert manager can search customer by Postal Code', async ({ page }) => {
-  /* 
-  Test:
-  1. Open Customers page.
-  2. Fill the postalCode to the search field
-  3. Assert customer row is present in the table. 
-  4. Assert no other rows is present in the table.
-  */
+  // Busca pelo CEP do Harry Potter
+  await managerPage.searchCustomerInput.fill('E725JB');
+  
+  // Valida que o CEP "E725JB" aparece na tabela
+  await expect(page.getByRole('cell', { name: 'E725JB', exact: true })).toBeVisible();
 });

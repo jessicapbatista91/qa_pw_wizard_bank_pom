@@ -1,24 +1,23 @@
-import { test } from '@playwright/test';
-import { faker } from '@faker-js/faker';
-
-test.beforeEach(async ({ page }) => {
-  /* 
-  Pre-conditons:
-  1. Open Add Customer page.
-  2. Fill the First Name.  
-  3. Fill the Last Name.
-  4. Fill the Postal Code.
-  5. Click [Add Customer].
-  */
-});
+import { test, expect } from '@playwright/test';
+import { ManagerPage } from '../../../src/pages/manager/ManagerPage';
 
 test('Assert manager can delete customer', async ({ page }) => {
-  /* 
-  Test:
-  1. Open Customers page.
-  2. Click [Delete] for the row with customer name.
-  3. Assert customer row is not present in the table. 
-  4. Reload the page.
-  5. Assert customer row is not present in the table. 
-  */
+  const managerPage = new ManagerPage(page);
+  await page.goto('https://www.globalsqa.com/angularJs-protractor/BankingProject/#/manager/list');
+
+  // 1. Busca por um cliente específico (ex: Neville)
+  await managerPage.searchCustomerInput.fill('Neville');
+  
+  // 2. Garante que ele está na tabela antes de deletar
+  await expect(page.getByRole('cell', { name: 'Neville', exact: true })).toBeVisible();
+
+  // 3. Clica no botão de deletar daquela linha
+  await managerPage.deleteCustomerBtn.click();
+
+  // 4. Limpa a busca e procura de novo para garantir que sumiu
+  await managerPage.searchCustomerInput.clear();
+  await managerPage.searchCustomerInput.fill('Neville');
+  
+  // 5. Valida que não há mais nenhum registro com esse nome
+  await expect(page.getByRole('cell', { name: 'Neville', exact: true })).toHaveCount(0);
 });
