@@ -1,4 +1,4 @@
-// Arquivo: /src/pages/ManagerPage.js
+import { test, expect } from '@playwright/test';
 
 export class ManagerPage {
   /**
@@ -53,6 +53,8 @@ export class ManagerPage {
   async searchAndDeleteCustomer(firstName) {
     await this.customersTab.click();
     await this.searchCustomerInput.fill(firstName);
-    await this.deleteCustomerBtn.click();
+    
+    // Procura a linha da tabela (tr) que contém o nome digitado e clica no botão Delete dessa linha especificamente
+    await this.page.locator('tr', { hasText: firstName }).getByRole('button', { name: 'Delete' }).click();
   }
 }
