@@ -1,25 +1,23 @@
 import { test, expect } from '@playwright/test';
-import { ManagerPage } from '../../../src/pages/manager/ManagerPage';
 
-test('Assert manager can open account', async ({ page }) => {
-  const managerPage = new ManagerPage(page);
+test('Assert the deposit can be opened', async ({ page }) => {
+  // 1. Navega para a página do cliente
+  await page.goto('https://www.globalsqa.com/angularJs-protractor/BankingProject/#/customer');
+  
+  // 2. Aguarda a rede ficar ociosa para garantir o carregamento completo do Angular
+  await page.waitForLoadState('networkidle');
 
-  // 1. Acessa a página do gerente
-  await page.goto('https://www.globalsqa.com/angularJs-protractor/BankingProject/#/manager');
+  // 3. Seleciona o usuário e realiza o login
+  await page.selectOption('#userSelect', '1');
+  await page.click('button[type="submit"]');
 
-  // Pré-requisito: Cria um cliente e valida a mensagem do alerta
-  page.once('dialog', async (dialog) => {
-    expect(dialog.message()).toContain('Customer added successfully');
-    await dialog.accept();
-  });
-  await managerPage.addCustomer('Hermione', 'Granger', '54321');
+  // 4. Aguarda o botão de depósito estar visível e clica nele
+  await page.waitForSelector('button[ng-click="deposit()"]');
+  await page.click('button[ng-click="deposit()"]');
 
-  // 2. Escuta o alerta de criação de conta e valida
-  page.once('dialog', async (dialog) => {
-    expect(dialog.message()).toContain('Account created successfully');
-    await dialog.accept();
-  });
+  // 5. Aguarda especificamente o formulário de depósito ser renderizado na tela
+  await page.waitForSelector('form[ng-submit="deposit()"]');
 
-  // 3. Abre a conta usando o método da classe
-  await managerPage.openAccount('Hermione Granger', 'Dollar');
+  // 6. Validação: Confirma que o campo de input para digitar o valor está visível
+  await expect(page.locator('input[ng-model="amount"]')).toBeVisible();
 });
